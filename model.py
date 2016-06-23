@@ -3,15 +3,17 @@ from PIL import Image, ImageFilter
 import PIL
 import pandas as pd
 import numpy as np
+import xgboost as xgb
 
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn import metrics, cross_validation
 from sklearn.cross_validation import train_test_split
 from sklearn.metrics import classification_report, confusion_matrix, make_scorer, f1_score, precision_recall_curve, average_precision_score
 from sklearn.feature_selection import SelectPercentile, chi2
 from sklearn.pipeline import Pipeline
 from sklearn.svm import LinearSVC, SVC
+from sklearn.ensemble import ExtraTreesClassifier, GradientBoostingClassifier, RandomForestClassifier, AdaBoostClassifier, VotingClassifier, BaggingClassifier
 
 from features import *
 
@@ -23,40 +25,38 @@ def log_model():
 	return pipeline
 
 def svc_model():
-	clf = LinearSVC()
+	clf = SVC(class_weight='balanced', kernel='rbf', C=10)
+	scaler = MinMaxScaler()
+	select = SelectPercentile(score_func=chi2, percentile=10)
+	pipeline = Pipeline([('scale', scaler), ('select', select), ('svc', clf)])
+	return pipeline
+
+def lin_svc_model():
+	clf = LinearSVC(class_weight='balanced', C=10)
+	scaler = MinMaxScaler()
+	select = SelectPercentile(score_func=chi2, percentile=10)
+	pipeline = Pipeline([('scale', scaler), ('select', select), ('svc', clf)])
+	return pipeline	
+
+def rf_model():
+	clf = RandomForestClassifier(class_weight='balanced', max_depth=None, max_features=None, min_samples_split=1,n_estimators=91, criterion='entropy')
 	scaler = MinMaxScaler()
 	select = SelectPercentile(score_func=chi2, percentile=10)
 	pipeline = Pipeline([('scale', scaler), ('select', select), ('logre', clf)])
 	return pipeline
 
-if __name__ == '__main__':
-	X, y = get_X_y()
-	print "X and y are extracted"
-	print X.shape # for checking
+def xgb_model():
+	clf = xgb.XGBClassifier(n_estimators =90,reg_lambda=0.011, gamma=0.5, max_depth=16, subsample=1, colsample_bytree=1)
+	scaler = MinMaxScaler()
+	select = SelectPercentile(score_func=chi2, percentile=10)
+	pipeline = Pipeline([('scale', scaler), ('select', select), ('xgb', clf)])
+	return pipeline
 
-	clf = log_model()
-
-	"""
-	print "Done, time to cross-validate"
-	scores = cross_validation.cross_val_score(clf, X, y, cv = 5, scoring = "accuracy", n_jobs = 2, verbose=2)
-	print scores
-	"""
-
-	
-	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.80, random_state=10)
-	
-	print X_test.shape
-	clf.fit(X_train, y_train)
-	print "fitted"
-	y_pred = clf.predict(X_test)
-	print "Classification Report:"
-	print metrics.classification_report(y_test, y_pred)
-	print f1_score(y_test, y_pred, average='macro')
-	cm = confusion_matrix(y_test, y_pred)
-	
-	print "Confusion Matrix:"
-	print cm
-
-
+def sgd_model():
+	clf = SGDClassifier(class_weight='balanced')
+	scaler = MinMaxScaler()
+	select = SelectPercentile(score_func=chi2, percentile=50)
+	pipeline = Pipeline([('scale', scaler), ('select', select), ('sgd', clf)])
+	return pipeline
 
 
