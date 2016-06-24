@@ -6,6 +6,7 @@ import numpy as np
 import xgboost as xgb
 
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn import metrics, cross_validation
 from sklearn.cross_validation import train_test_split
@@ -35,18 +36,25 @@ def lin_svc_model():
 	clf = LinearSVC(class_weight='balanced', C=10)
 	scaler = MinMaxScaler()
 	select = SelectPercentile(score_func=chi2, percentile=10)
-	pipeline = Pipeline([('scale', scaler), ('select', select), ('svc', clf)])
+	pipeline = Pipeline([('scale', scaler), ('select', select), ('linsvc', clf)])
 	return pipeline	
 
 def rf_model():
-	clf = RandomForestClassifier(class_weight='balanced', max_depth=None, max_features=None, min_samples_split=1,n_estimators=91, criterion='entropy')
+	clf = RandomForestClassifier(class_weight='balanced')
 	scaler = MinMaxScaler()
 	select = SelectPercentile(score_func=chi2, percentile=10)
-	pipeline = Pipeline([('scale', scaler), ('select', select), ('logre', clf)])
+	pipeline = Pipeline([('scale', scaler), ('select', select), ('ranf', clf)])
+	return pipeline
+
+def k_nearest_model():
+	select = SelectPercentile(score_func=chi2, percentile=10)
+	knc = KNeighborsClassifier(weights='uniform', algorithm='auto')
+	scaler = MinMaxScaler()
+	pipeline = Pipeline([('scale', scaler), ('select', select) , ('knear', knc)])
 	return pipeline
 
 def xgb_model():
-	clf = xgb.XGBClassifier(n_estimators =90,reg_lambda=0.011, gamma=0.5, max_depth=16, subsample=1, colsample_bytree=1)
+	clf = xgb.XGBClassifier()
 	scaler = MinMaxScaler()
 	select = SelectPercentile(score_func=chi2, percentile=10)
 	pipeline = Pipeline([('scale', scaler), ('select', select), ('xgb', clf)])

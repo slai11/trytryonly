@@ -21,20 +21,26 @@ warnings.filterwarnings("ignore")
 
 
 def search_grid(X, y):
-	model = svc_model()
+	#### Uncomment out the model you are testing
+	#model = log_model
+	#model = lin_svc_model()
+	#model = svc_model()
+	#model = rf_model()
+	#model = k_nearest_model()
 	
 	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4, random_state=10)
-	param_grid = dict(svc__kernel=["rbf"], svc__C=[1,5,10,20,50], svc__tol=[1e-8, 1e-4, 1e-2, 1e-1], svc__gamma = np.logspace(-9, 3, 13))
 
+	#### Un-comment the relevant param_grid
+	#param_grid = dict(logre__penalty=['l1', 'l2'], logre__C = [1,5,10,20,50], logre__tol=[1e-8, 1e-4, 1e-1])
+	#param_grid = dict(linsvc__C=[1,5,10,20,50], linsvc__penalty=['l1','l2'], linsvc__tol=[1e-8, 1e-4, 1e-2, 1e-1])
+	#param_grid = dict(randf__max_features=["auto", "log2", None], randf__n_estimators=np.arange(1,100,20), randf__min_samples_split=np.arange(1,100,10), randf__max_depth=[None, 1, 10, 20, 30])
+	#param_grid = dict(svc__kernel=['rbf'], svc__gamma=np.arange(0,10,1), svc__C =[1,5,10,20,50], svc__tol=[1e-8, 1e-4, 1e-1])
+	#param_grid = dict(knear__algorithm=['auto', 'ball_tree', 'kd_tree', 'brute'], knear__n_neighbors=np.arange(1,20,2), knear__weights=['uniform', 'distance'])
+
+	#param_grid = dict(svc__kernel=["rbf"], svc__C=[1,5,10,20,50], svc__tol=[1e-8, 1e-4, 1e-2, 1e-1], svc__gamma = np.logspace(-9, 3, 13))
 	#dict(xgb__max_depth=np.arange(1,20,1), xgb__gamma=np.arange(0,10,1), xgb__eta=np.arange(0.01, 1, 0.05), xgb__max_delta_step=np.arange(0,100,1))
-	#dict(select__percentile=np.arange(1,99,10), svc__kernel=['rbf'], svc__gamma=np.arange(0,10,1), svc__C = (2.0**np.arange(-10, 10, 4)), svc__tol=[1e-8, 1e-4, 1e-1])
-	#dict(select__percentile=np.arange(10,99,10), extra__n_estimators=np.arange(1,100,10), extra__max_features=[None, 'auto', 'sqrt', 'log2'])
-	#dict(select__percentile=np.arange(10,99,10), randf__max_features=["auto", "log2", None], randf__n_estimators=np.arange(1,100,10), randf__min_samples_split=np.arange(1,100,10), randf__max_depth=[None, 1, 10, 20, 30])
-	#dict(select__percentile=np.arange(1,99,10), gb__loss=['deviance', 'exponential'], gb__learning_rate = (2.0**np.arange(-10,10,4)), gb__max_depth= np.arange(1,20,2), gb__max_features=[None, "auto", "sqrt", "log2"])
-	#dict(select__percentile=np.arange(1,99,10), knear__algorithm=['auto', 'ball_tree', 'kd_tree', 'brute'], knear__n_neighbors=np.arange(1,20,1), knear__weights=['uniform', 'distance'])
-	#dict(select__percentile=np.arange(1,99,10), linsvc__C=(2.0**np.arange(-10,10,4)), linsvc__penalty=['l1','l2'], linsvc__tol=[1e-8, 1e-4, 1e-2, 1e-1])
-	#dict(select__percentile=np.arange(10,99,10), randf__max_features=["auto", "log2", None], randf__n_estimators=np.arange(1,100,10), randf__min_samples_split=np.arange(1,100,10), randf__max_depth=[None, 1, 10, 20, 30])
-	#dict(select__percentile=np.arange(1,99,10), logre__penalty=['l1', 'l2'], logre__C = (2.0**np.arange(-10, 20, 4)), logre__tol=[1e-8, 1e-4, 1e-1])
+	#dict(select__percentile=np.arange(1,99,10), svc__kernel=['rbf'], svc__gamma=np.arange(0,10,1), svc__C = (2.0**np.arange(-10, 10, 4)), svc__tol=[1e-8, 1e-4, 1e-1])	
+
 	grid = GridSearchCV(model, cv=5, param_grid=param_grid, scoring='f1_macro', n_jobs=-1, verbose=4)
 	grid.fit(X,y)
 
@@ -49,8 +55,8 @@ if __name__ == '__main__':
 	print "X and y are extracted"
 	print X.shape # for checking
 
-	#search_grid(X,y)
-	
+	search_grid(X,y)
+	'''
 	clf = lin_svc_model()
 
 	
@@ -73,3 +79,5 @@ if __name__ == '__main__':
 	
 	print "Confusion Matrix:"
 	print cm
+
+'''
