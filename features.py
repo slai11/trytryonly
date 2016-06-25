@@ -4,6 +4,8 @@ import PIL
 import pandas as pd
 import numpy as np
 
+from skimage import feature
+
 
 """
 Possible new features
@@ -35,7 +37,7 @@ def get_image_array(image_name):
 	filename = "Archive/roof_images/" + str(image_name) + ".jpg"
 	
 	image_feat = []
-	basewidth = 200 #can change this, but best nt to overfit it
+	basewidth = 150 #can change this, but best nt to overfit it
 	img = Image.open(filename)
 
 	# first feature, convert to black and white
@@ -43,15 +45,29 @@ def get_image_array(image_name):
 	img = img.resize((basewidth, basewidth), PIL.Image.ANTIALIAS)
 	array = np.array(img)
 	newlength = basewidth*basewidth
-	array = array.reshape(1, newlength)
+	newarray = array.reshape(1, newlength)
 
 	# second feature, apply gaussian blur
 	blurred_img = img.filter(ImageFilter.GaussianBlur(radius=2))
 	blur = np.array(blurred_img)
 	blur = blur.reshape(1, newlength)
 
-	image_feat.append(array)
+	sobel = sobel_edge(array)
+
+	newlength = sobel.shape[0] * sobel.shape[1]
+	print newlength
+	sobel = sobel.reshape(1, newlength)
+
+	"""blob = detect_blob(array)
+				print blob.shape
+				newlength = blob.shape[0] * blob.shape[1]
+				blob = blob.reshape(1, newlength)"""
+
+	image_feat.append(newarray)
 	image_feat.append(blur)
+	image_feat.append(sobel)
+	#image_feat.append(blob)
+
 	image_feat = np.hstack(image_feat)
 
 	return image_feat
@@ -66,8 +82,8 @@ def get_feature_array(inputlist):
 	return main_x
 
 
-def get_X_y():
-	df = pd.read_csv("id_train.csv")
+def get_X_y(filename):
+	df = pd.read_csv(filename)
 	subset = df[["Id", "label"]]
 	inputlist = [tuple(x) for x in subset.values]
 	X = get_feature_array(inputlist)
@@ -77,4 +93,22 @@ def get_X_y():
 	y = np.array(y)
 
 	return X, y
+
+
+#############
+# Features #
+#############
+
+
+
+def sobel_edge(img):
+	edge = feature.canny(img, sigma=2)
+	edge = np.array(edge)
+	return edge
+
+def detect_blob(img):
+	blob = feature.blob_dog(img, threshold = 0.5, max_sigma = 20)
+	blob = np.array(blob)
+	return blob
+
 

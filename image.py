@@ -177,27 +177,6 @@ if __name__ == '__main__':
 
 	model.save_weights('first_try.h5')
 
-#new approach
-"""
-1. binarize - get features 300x300  -> flatten it
-2. blurring
-
-flattern them into n_obs x n_features np array
-run in log regression model, svm, xgboost, trees
-
-"""
-
-'''
-basewidth = 300
-img = Image.open('somepic.jpg')
-hsize=300
-img = img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
-array = np.array(img)
-newlength = basewidth*basewidth
-array = array.reshape(1, newlength)
-
-img.save('sompic.jpg')
-'''
 
 
 

@@ -42,13 +42,13 @@ def lin_svc_model():
 def rf_model():
 	clf = RandomForestClassifier(class_weight='balanced')
 	scaler = MinMaxScaler()
-	select = SelectPercentile(score_func=chi2, percentile=10)
+	select = SelectPercentile(score_func=chi2, percentile=1)
 	pipeline = Pipeline([('scale', scaler), ('select', select), ('ranf', clf)])
 	return pipeline
 
 def k_nearest_model():
 	select = SelectPercentile(score_func=chi2, percentile=10)
-	knc = KNeighborsClassifier(weights='uniform', algorithm='auto')
+	knc = KNeighborsClassifier(weights='uniform', algorithm='auto', n_neighbors = 15)
 	scaler = MinMaxScaler()
 	pipeline = Pipeline([('scale', scaler), ('select', select) , ('knear', knc)])
 	return pipeline
